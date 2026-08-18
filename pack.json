@@ -1,0 +1,102 @@
+{
+  "tables": [
+    {
+      "name": "bureau_note",
+      "description": "Documents de l'éditeur de texte",
+      "min_role_read": 8,
+      "min_role_write": 8,
+      "ownership_field_name": "user",
+      "fields": [
+        { "name": "titre", "label": "Titre", "type": "String", "required": true, "attributes": {} },
+        { "name": "contenu", "label": "Contenu", "type": "String", "required": false, "attributes": { "textarea": true } },
+        { "name": "dossier", "label": "Dossier", "type": "String", "required": false, "attributes": {} },
+        { "name": "maj", "label": "Dernière modification", "type": "Date", "required": false, "attributes": {} },
+        { "name": "user", "label": "Propriétaire", "type": "Key", "reftable_name": "users", "reftype": "Integer", "refname": "id", "required": false, "attributes": {} }
+      ]
+    },
+    {
+      "name": "bureau_evenement",
+      "description": "Évènements du calendrier",
+      "min_role_read": 8,
+      "min_role_write": 8,
+      "ownership_field_name": "user",
+      "fields": [
+        { "name": "titre", "label": "Titre", "type": "String", "required": true, "attributes": {} },
+        { "name": "description", "label": "Description", "type": "String", "required": false, "attributes": { "textarea": true } },
+        { "name": "debut", "label": "Début", "type": "Date", "required": false, "attributes": {} },
+        { "name": "fin", "label": "Fin", "type": "Date", "required": false, "attributes": {} },
+        { "name": "toute_journee", "label": "Toute la journée", "type": "Bool", "required": false, "attributes": {} },
+        { "name": "alerte_minutes", "label": "Alerte (minutes avant)", "type": "Integer", "required": false, "attributes": {} },
+        { "name": "couleur", "label": "Couleur", "type": "String", "required": false, "attributes": {} },
+        { "name": "user", "label": "Propriétaire", "type": "Key", "reftable_name": "users", "reftype": "Integer", "refname": "id", "required": false, "attributes": {} }
+      ]
+    },
+    {
+      "name": "bureau_tache",
+      "description": "Tâches à faire",
+      "min_role_read": 8,
+      "min_role_write": 8,
+      "ownership_field_name": "user",
+      "fields": [
+        { "name": "titre", "label": "Titre", "type": "String", "required": true, "attributes": {} },
+        { "name": "notes", "label": "Notes", "type": "String", "required": false, "attributes": { "textarea": true } },
+        { "name": "echeance", "label": "Échéance", "type": "Date", "required": false, "attributes": {} },
+        { "name": "priorite", "label": "Priorité", "type": "Integer", "required": false, "attributes": { "min": 1, "max": 3 } },
+        { "name": "terminee", "label": "Terminée", "type": "Bool", "required": false, "attributes": {} },
+        { "name": "liste", "label": "Liste", "type": "String", "required": false, "attributes": {} },
+        { "name": "user", "label": "Propriétaire", "type": "Key", "reftable_name": "users", "reftype": "Integer", "refname": "id", "required": false, "attributes": {} }
+      ]
+    },
+    {
+      "name": "bureau_depense",
+      "description": "Opérations de budget",
+      "min_role_read": 8,
+      "min_role_write": 8,
+      "ownership_field_name": "user",
+      "fields": [
+        { "name": "libelle", "label": "Libellé", "type": "String", "required": true, "attributes": {} },
+        { "name": "montant", "label": "Montant", "type": "Float", "required": false, "attributes": {} },
+        { "name": "categorie", "label": "Catégorie", "type": "String", "required": false, "attributes": {} },
+        { "name": "date_op", "label": "Date", "type": "Date", "required": false, "attributes": {} },
+        { "name": "sens", "label": "Sens", "type": "String", "required": false, "attributes": { "options": "depense,revenu" } },
+        { "name": "user", "label": "Propriétaire", "type": "Key", "reftable_name": "users", "reftype": "Integer", "refname": "id", "required": false, "attributes": {} }
+      ]
+    },
+    {
+      "name": "bureau_pref",
+      "description": "Préférences du bureau : position des fenêtres, fond d'écran",
+      "min_role_read": 8,
+      "min_role_write": 8,
+      "ownership_field_name": "user",
+      "fields": [
+        { "name": "cle", "label": "Clé", "type": "String", "required": true, "attributes": {} },
+        { "name": "valeur", "label": "Valeur", "type": "String", "required": false, "attributes": { "textarea": true } },
+        { "name": "user", "label": "Propriétaire", "type": "Key", "reftable_name": "users", "reftype": "Integer", "refname": "id", "required": false, "attributes": {} }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "name": "Bureau",
+      "viewtemplate": "Bureau",
+      "table": "bureau_pref",
+      "min_role": 8,
+      "configuration": {
+        "nom_systeme": "Bureau",
+        "veille_minutes": 10,
+        "prefs_table": "bureau_pref",
+        "user_field": "user",
+        "fond": "Sombre dégradé",
+        "applications": [],
+        "alertes_table": "bureau_evenement",
+        "alertes_champ_titre": "titre",
+        "alertes_champ_date": "debut",
+        "alertes_champ_minutes": "alerte_minutes"
+      }
+    }
+  ],
+  "plugins": [],
+  "pages": [],
+  "roles": [],
+  "library": []
+}

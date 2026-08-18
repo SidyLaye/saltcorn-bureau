@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bureau — démonstration</title>
+<link rel="stylesheet" href="../public/bureau.css">
+<style>
+  html,body{margin:0;height:100%;background:#050505;}
+  #bureau-racine{height:100vh;border:0;border-radius:0;}
+  /* Habillage minimal du contenu injecté, tenant lieu de thème Saltcorn */
+  .br-embed{font-size:13.5px;}
+  .br-embed h4{font-size:16px;margin:0 0 12px;}
+  .br-embed table{width:100%;border-collapse:collapse;}
+  .br-embed th{text-align:left;padding:6px 10px;font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;color:#8a8a8a;border-bottom:2px solid #f2f2f2;}
+  .br-embed td{padding:7px 10px;border-bottom:1px solid rgba(242,242,242,.14);}
+  .br-embed tr:hover td{background:rgba(255,255,255,.04);}
+  .br-embed a{color:#fff;}
+  .br-embed .btn{display:inline-block;padding:5px 11px;border:2px solid #f2f2f2;border-radius:4px;
+    color:#f2f2f2;text-decoration:none;font-size:12px;cursor:pointer;background:transparent;}
+  .br-embed .btn-primary{background:#f2f2f2;color:#0a0a0a;font-weight:600;}
+  .br-embed input,.br-embed textarea,.br-embed select{width:100%;padding:7px 9px;background:#0d0d0d;
+    color:#f2f2f2;border:2px solid #f2f2f2;border-radius:4px;font-family:inherit;font-size:13px;}
+  .br-embed label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:#8a8a8a;margin:10px 0 4px;}
+  .br-embed .muted{color:#8a8a8a;font-size:11.5px;}
+</style>
+</head>
+<body>
+
+<div id="bureau-racine" class="bureau">
+  <div class="bureau-chargement">Démarrage…</div>
+</div>
+
+<script>
+/* Configuration de la démonstration. En production, cette chaîne est
+   produite par le view template à partir de sa configuration. */
+(function () {
+  const ic = (d) =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+
+  const ICONES_DEMO = {
+    notes:    ic('<path d="M4 3h11l5 5v13H4z"/><path d="M15 3v5h5"/><path d="M8 13h8M8 17h5"/>'),
+    agenda:   ic('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+    taches:   ic('<path d="M4 7l2.5 2.5L11 5"/><path d="M4 17l2.5 2.5L11 15"/><path d="M14 8h6M14 18h6"/>'),
+    budget:   ic('<path d="M3 20V10M9 20V4M15 20v-7M21 20V7"/>'),
+    contacts: ic('<path d="M5 3h14v18H5z"/><circle cx="12" cy="10" r="2.5"/><path d="M8 17c1-2 2.4-3 4-3s3 1 4 3"/>'),
+    plus:     ic('<path d="M12 5v14M5 12h14"/>'),
+  };
+
+  const app = (id, libelle, icone, vue, l, h) => ({
+    id: "vue-" + id, libelle, icone: ICONES_DEMO[icone],
+    url: "/view/" + vue, embed: vue, largeur: l, hauteur: h,
+  });
+
+  document.getElementById("bureau-racine").setAttribute("data-config", JSON.stringify({
+    viewname: "demo",
+    nom_systeme: "Bureau",
+    veille_minutes: 0,
+    fond: "Sombre dégradé",
+    memorise_positions: true,
+    alertes: true,
+    utilisateur: { id: 1, email: "moi@exemple.fr", role_id: 1 },
+    applications: [
+      app("notes", "Notes", "notes", "notes", 720, 460),
+      app("agenda", "Calendrier", "agenda", "agenda", 760, 420),
+      app("taches", "Tâches", "taches", "taches", 640, 420),
+      app("budget", "Budget", "budget", "budget", 780, 460),
+      app("contacts", "Contacts", "contacts", "contacts", 620, 420),
+      app("note_edit", "Nouvelle note", "plus", "note_edit", 520, 420),
+    ],
+  }));
+})();
+
+/* Fausses réponses serveur : des fragments qui ressemblent à ce que
+   renvoie /view/<nom> une fois habillé par le thème du site. */
+(function () {
+  const prefs = {};
+
+  window.BUREAU_API_MOCK = function (route, body) {
+    return new Promise((r) => setTimeout(() => {
+      if (route === "pref_get") r({ success: true, valeur: prefs[body.cle] || null });
+      else if (route === "pref_set") { prefs[body.cle] = body.valeur; r({ success: true }); }
+      else if (route === "alertes") r({ success: true, alertes: [] });
+      else r({ success: true, connecte: true });
+    }, 20));
+  };
+
+  const ligne = (c) => "<tr>" + c.map((x) => `<td>${x}</td>`).join("") + "</tr>";
+
+  const FRAGMENTS = {
+    "/view/notes": `
+      <h4>Documents</h4>
+      <p><a class="btn btn-primary" href="#">Nouveau document</a></p>
+      <table><thead><tr><th>Titre</th><th>Dossier</th><th>Modifié</th><th></th></tr></thead><tbody>
+      ${ligne(["Idées de projets", "Travail", "18/08", '<a href="#">Ouvrir</a>'])}
+      ${ligne(["Notes de lecture", "Personnel", "17/08", '<a href="#">Ouvrir</a>'])}
+      ${ligne(["Courses", "Maison", "15/08", '<a href="#">Ouvrir</a>'])}
+      ${ligne(["Compte rendu du 12", "Travail", "12/08", '<a href="#">Ouvrir</a>'])}
+      </tbody></table>
+      <p class="muted" style="margin-top:14px">Vue « List » sur la table bureau_note — modifiable dans le builder.</p>`,
+
+    "/view/agenda": `
+      <h4>Évènements à venir</h4>
+      <table><thead><tr><th>Date</th><th>Titre</th><th>Alerte</th></tr></thead><tbody>
+      ${ligne(["18/08 10:00", "Point hebdo", "10 min avant"])}
+      ${ligne(["19/08 19:00", "Sport", "30 min avant"])}
+      ${ligne(["20/08 15:30", "Dentiste", "1 h avant"])}
+      ${ligne(["23/08", "Anniversaire de Awa", "1 jour avant"])}
+      </tbody></table>
+      <p class="muted" style="margin-top:14px">Ici une vue « List ». Installez le module Calendar du store pour une vraie grille mensuelle — elle s'ajoute au bureau de la même façon.</p>`,
+
+    "/view/taches": `
+      <h4>À faire</h4>
+      <table><thead><tr><th></th><th>Tâche</th><th>Échéance</th><th>Priorité</th></tr></thead><tbody>
+      ${ligne(['<input type="checkbox" style="width:auto">', "Relancer le client pour la facture 2026-041", "16/08", "Haute"])}
+      ${ligne(['<input type="checkbox" style="width:auto">', "Écrire la page d'accueil du portfolio", "19/08", "Haute"])}
+      ${ligne(['<input type="checkbox" style="width:auto">', "Prendre rendez-vous chez le garagiste", "—", "Normale"])}
+      ${ligne(['<input type="checkbox" style="width:auto" checked>', "Recompiler le thème", "—", "Basse"])}
+      </tbody></table>`,
+
+    "/view/budget": `
+      <h4>Août 2026</h4>
+      <p><strong style="font-size:20px">2 087,15 €</strong> <span class="muted">solde du mois</span></p>
+      <table><thead><tr><th>Date</th><th>Libellé</th><th>Catégorie</th><th>Montant</th></tr></thead><tbody>
+      ${ligne(["17/08", "Restaurant", "Sorties", "− 38,00 €"])}
+      ${ligne(["16/08", "Essence", "Transport", "− 62,30 €"])}
+      ${ligne(["14/08", "Courses de la semaine", "Alimentation", "− 96,40 €"])}
+      ${ligne(["12/08", "Mission freelance", "Revenus", "+ 850,00 €"])}
+      ${ligne(["03/08", "Loyer", "Logement", "− 780,00 €"])}
+      </tbody></table>`,
+
+    "/view/contacts": `
+      <h4>Contacts</h4>
+      <table><thead><tr><th>Nom</th><th>Téléphone</th><th>Courriel</th></tr></thead><tbody>
+      ${ligne(["Awa D.", "06 12 34 56 78", "awa@exemple.fr"])}
+      ${ligne(["Garage Central", "01 45 67 89 10", "contact@garage.fr"])}
+      ${ligne(["Client Nord", "—", "compta@client-nord.fr"])}
+      </tbody></table>
+      <p class="muted" style="margin-top:14px">Une table créée en trois clics, ses vues générées automatiquement, ajoutée au bureau. Aucun code.</p>`,
+
+    "/view/note_edit": `
+      <h4>Nouveau document</h4>
+      <form onsubmit="return false">
+        <label>Titre</label><input value="">
+        <label>Dossier</label>
+        <select><option>Travail</option><option>Personnel</option><option>Maison</option></select>
+        <label>Contenu</label><textarea rows="7"></textarea>
+        <p style="margin-top:14px"><button class="btn btn-primary">Enregistrer</button></p>
+      </form>
+      <p class="muted">Vue « Edit » standard : c'est Saltcorn qui gère le formulaire, la validation et l'enregistrement.</p>`,
+  };
+
+  window.BUREAU_FRAGMENT_MOCK = function (url) {
+    return new Promise((r) =>
+      setTimeout(() => r(FRAGMENTS[url] || `<div class="br-vide">Vue « ${url} » introuvable</div>`), 220)
+    );
+  };
+})();
+</script>
+<script src="../public/bureau.js"></script>
+</body>
+</html>

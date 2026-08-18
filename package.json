@@ -1,0 +1,20 @@
+{
+  "name": "saltcorn-bureau",
+  "version": "0.1.0",
+  "description": "Bureau — un environnement de type système d'exploitation pour Saltcorn : fenêtres, barre des tâches, veille, et applications de gestion de vie (notes, calendrier, tâches, budget).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"no tests yet\" && exit 0"
+  },
+  "keywords": [
+    "saltcorn-plugin",
+    "desktop",
+    "productivity"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://example.com/saltcorn-bureau"
+  }
+}
